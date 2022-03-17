@@ -51,6 +51,13 @@ const registrationStyles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "flex-end",
         marginVertical: 5,
+    },
+    showPassword:{
+        position: "absolute",
+        right: "5%",
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
     }
 });
 

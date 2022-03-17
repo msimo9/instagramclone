@@ -1,13 +1,12 @@
 //imports
 import { app } from "./firebase";
 import { db } from "./firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; 
-
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 //functions
 
-export const handleUserSignUp = (email, username, fullName, password) => {
+export const handleUserSignUp = (email, username, fullName, password, navigation) => {
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
@@ -15,11 +14,13 @@ export const handleUserSignUp = (email, username, fullName, password) => {
     const userID = user.uid;
     handleSaveAdditionalInfo(email, username, fullName, userID)
     console.log("user ", user, " signed up successfully!");
+    navigation.navigate("Tab");
     })
     .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, " ", errorMessage);
+        const errorM = errorCode + " " + errorMessage;
+        alert(errorM);
     });
 }
 

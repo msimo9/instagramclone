@@ -3,18 +3,21 @@ import {createStore} from 'redux';
 const SAVE_USERID = "SAVE_USERID";
 
 const initialState = {
-    userID: "123",
+    userID: "",
 }
 
 export const saveUserID = (uid) => ({
     type: SAVE_USERID,
-    payload: uid
+    payload: {uid},
 });
 
 export const rootReducer = (state = initialState, action) => {
     switch(action.type){
         case SAVE_USERID:
-            return state;
+            return {
+                ...state,
+                userID: action.payload.uid,
+            }
         default: return state;
     }
 }
