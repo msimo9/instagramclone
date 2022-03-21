@@ -4,6 +4,7 @@ const SAVE_USERID = "SAVE_USERID";
 
 const initialState = {
     userID: "",
+    profilePhotoURL: "",
 }
 
 export const saveUserID = (uid) => ({

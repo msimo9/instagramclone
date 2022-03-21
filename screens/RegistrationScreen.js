@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, LogBox, Image} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import registrationStyles from './styles/registrationStyle'
 import InstagramLogoCursive from '../components/InstagramLogoCursive'
 import BlueButton from '../components/BlueButton';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { handleUserSignUp } from '../firebase/writes';
-import { handleUserLogIn } from '../firebase/reads';
+import { handleUserSignUp, uploadDefaultProfilePicture } from '../firebase/writes';
+import { getProfilePhoto, handleUserLogIn } from '../firebase/reads';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUserID } from '../redux';
 
+LogBox.ignoreLogs(['Warning: Async Storage has been extracted from react-native core']);
 
 const authObserver = () => {
   const dispatch = useDispatch();
