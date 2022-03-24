@@ -16,7 +16,7 @@ export const handleUserLogIn = (email, password, navigation) => {
         const user = userCredential.user;
         const userID = user.uid;
         console.log("Log in successful!");
-        navigation.navigate("Tab");
+        navigation.navigate("Tab", {screen: "Tab"});
     })
     .catch((error) => {
         const errorCode = error.code;

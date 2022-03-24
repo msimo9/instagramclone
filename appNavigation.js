@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -13,22 +14,42 @@ import ProfileScreen from './screens/ProfileScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import ExploreScreen from "./screens/ExploreScreen";
+import CameraScreen from './screens/CameraScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
+const TopTab = createMaterialTopTabNavigator();
 
 const MainStackNavigator = () => {
     return(
         <NavigationContainer>
             <Stack.Navigator
-                screenOptions={{ headerShown: false }}
+                screenOptions={{
+                    headerShown: false,
+                }}
             >
                 <Stack.Screen name="Welcome" component={WelcomeScreen} />
                 <Stack.Screen name="Registration" component={RegistrationScreen} />
-                <Stack.Screen name="Tab" component={MainTabNavigator} />
+                <Stack.Screen name="Tab" component={MainTopTabNavigator} />
             </Stack.Navigator>
         </NavigationContainer>
+    )
+}
+
+const MainTopTabNavigator = () => {
+    return(
+        <TopTab.Navigator
+            screenOptions={{
+                headerShown: false,
+                tabBarActiveTintColor: "black",
+                tabBarStyle:{
+                    height: 0
+                }
+            }}
+        >
+            <TopTab.Screen name={"Camera"} component={CameraScreen} />
+            <TopTab.Screen name={"Tab"} component={MainTabNavigator} />
+        </TopTab.Navigator>
     )
 }
 

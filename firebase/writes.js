@@ -17,7 +17,7 @@ export const handleUserSignUp = (email, username, fullName, password, navigation
     handleSaveAdditionalInfo(email, username, fullName, userID);
     uploadDefaultProfilePicture(userID);
     console.log("user ", user, " signed up successfully!");
-    navigation.navigate("Tab");
+    navigation.navigate("Tab", {screen: "Tab"});
     })
     .catch((error) => {
         const errorCode = error.code;

@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView} from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Animated, I18nManager} from 'react-native'
+import React, { useEffect, useState, Component } from 'react'
 import { getProfilePhoto } from '../firebase/reads'
 import { useSelector } from 'react-redux'
 import feedStyles from './styles/feedStyle'
