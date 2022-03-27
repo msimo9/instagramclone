@@ -1,16 +1,20 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal} from 'react-native'
 import React, { useState, useEffect } from 'react'
 import profileStyles from './styles/profileStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {getProfilePhoto} from '../firebase/reads';
 import { useSelector } from 'react-redux';
+import EditProfile from '../components/Profile/EditProfile';
 
-const Header = () => {
+const Header = ({}) => {
   const [image, setImage] = useState("");
   const [imageReady, setImageReady] = useState(false);
   const handleSetImage = (url) =>  {setImage(url);}
   const toggleImageReady = () => {setImageReady(!imageReady);}
   const userID = useSelector(state => state.userID);
+  const [modalVisibility, setModalVisibility] = useState(false);
+  const toggleModalVisibility = () => {setModalVisibility(!modalVisibility);}
+  
 
   useEffect(() => {
     getProfilePhoto(userID, handleSetImage, toggleImageReady);
@@ -21,6 +25,7 @@ const Header = () => {
 
   return(
     <View style={profileStyles.headerWrapper}>
+      {modalVisibility && <EditProfile modalVisibility={modalVisibility} toggleModalVisibility={toggleModalVisibility} profilePhoto={image} />}
       <View style={profileStyles.topHeader}>
         <View style={{flexDirection: "row", width: "70%", alignItems: "center"}}>
           <Icon name={"lock-closed-outline"} color={"#ffffff"} size={20} />
@@ -59,7 +64,7 @@ const Header = () => {
       </View>
 
       <View style={profileStyles.bottomHeader}>
-        <TouchableOpacity style={profileStyles.editProfile}>
+        <TouchableOpacity style={profileStyles.editProfile} onPress={() => toggleModalVisibility()}>
           <Text style={profileStyles.editProfileText}>Edit Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={profileStyles.addFriend}>
