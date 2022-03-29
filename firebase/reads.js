@@ -2,7 +2,7 @@
 import { app } from "./firebase";
 import { db } from "./firebase";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc} from "firebase/firestore";
+import { doc, setDoc, getDoc} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 
@@ -36,4 +36,20 @@ export const getProfilePhoto = (userID, handleSetImage, toggleImageReady) => {
     .catch((error) => {
         console.log(error);
     });
+}
+
+export const readSocialData = async (userID, setData, toggleDataReady) => {
+    const docRef = doc(db, "userInfo", userID);
+    const docSnap = await getDoc(docRef);
+    let tempDataArr = [];
+
+    if (docSnap.exists()) {
+        tempDataArr.push(docSnap.data().posts);
+        tempDataArr.push(docSnap.data().followers.length);
+        tempDataArr.push(docSnap.data().following.length);
+        setData(tempDataArr);
+        toggleDataReady();
+    } else {
+        console.log("No such document!");
+    }
 }

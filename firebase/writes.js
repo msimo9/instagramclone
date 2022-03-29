@@ -2,22 +2,23 @@
 import { app } from "./firebase";
 import { db } from "./firebase";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable} from "firebase/storage";
 import * as ImagePicker from 'expo-image-picker';
+import { useSelector } from "react-redux";
 
 //functions
 
 export const handleUserSignUp = (email, username, fullName, password, navigation) => {
+    const navigateToStart = () => {navigation.navigate("Tab", {screen: "Tab"});}
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
     const user = userCredential.user;
     const userID = user.uid;
     handleSaveAdditionalInfo(email, username, fullName, userID);
-    uploadDefaultProfilePicture(userID);
+    uploadDefaultProfilePicture(userID, navigateToStart);
     console.log("user ", user, " signed up successfully!");
-    navigation.navigate("Tab", {screen: "Tab"});
     })
     .catch((error) => {
         const errorCode = error.code;
@@ -33,11 +34,17 @@ export const handleSaveAdditionalInfo = async (email, username, fullName, userID
             email: email,
             username: username,
             fullName: fullName,
+            prononouns: "",
+            website: "",
+            bio: "",
+            followers: [],
+            following: [],
+            posts: 0,
         }
     );
 }
 
-export const uploadDefaultProfilePicture = async(userID) => {
+export const uploadDefaultProfilePicture = async(userID, navigateToStart) => {
     let file = {
         uri: "https://firebasestorage.googleapis.com/v0/b/instagramclone-a573f.appspot.com/o/defaultProfilePhoto%2Fdefault_avatar.png?alt=media&token=62b298c9-92e7-4cab-9edf-dcbaa9b08f1a",
         cancelled: false,
@@ -83,24 +90,14 @@ export const uploadDefaultProfilePicture = async(userID) => {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL);
+          navigateToStart();
         });
       }
     );
 
 }
 
-export const uploadCustomProfilePicture = async(userID) => {
-    // No permissions request is necessary for launching the image library
-    let file = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-  
-      //console.log(file.uri);
-  
-      if (!file.cancelled) {
+export const uploadCustomProfilePicture = async(userID, file) => {
 
         //making a blob response out of picked image
         const response = await fetch(file.uri);
@@ -110,10 +107,25 @@ export const uploadCustomProfilePicture = async(userID) => {
         const imagePath = file.uri;
         const storage = getStorage();
         const imageFormat = imagePath.substring(imagePath.length-3);
-        var storageRef = ref(storage, uid + '/profilePicture/profilePhoto.'+imageFormat);
+        var storageRef = ref(storage, '/userData/'+userID+'/profilePhoto.'+imageFormat);
 
         uploadBytes(storageRef, blob2).then((snapshot) => {
             console.log('Profile photo successfuly uploaded :)');
         });
-      }
+
+}
+
+export const addAdditionalUserInfo = async (userID, name, username, prononouns, website, bio, picture) => {
+
+  const updateRef= doc(db, "userInfo", userID);
+
+  await updateDoc(updateRef, {
+    fullName: name,
+    username: username,
+    prononouns: prononouns,
+    website: website,
+    bio: bio,
+  });
+
+  uploadCustomProfilePicture(userID, picture)
 }

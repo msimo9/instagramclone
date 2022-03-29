@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, Modal} from 'react-nat
 import React, { useState, useEffect } from 'react'
 import profileStyles from './styles/profileStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {getProfilePhoto} from '../firebase/reads';
+import {getProfilePhoto, readSocialData} from '../firebase/reads';
 import { useSelector } from 'react-redux';
 import EditProfile from '../components/Profile/EditProfile';
 
@@ -14,14 +14,17 @@ const Header = ({}) => {
   const userID = useSelector(state => state.userID);
   const [modalVisibility, setModalVisibility] = useState(false);
   const toggleModalVisibility = () => {setModalVisibility(!modalVisibility);}
-  
+  const [data, setData] = useState([]);
+  const [dataReady, setDataReady] = useState(false);
+  const toggleDataReady = () => {setDataReady(!dataReady);}
 
   useEffect(() => {
     getProfilePhoto(userID, handleSetImage, toggleImageReady);
+    readSocialData(userID, setData, toggleDataReady);
     }, []);
 
     useEffect(() => {
-    }, [imageReady,image])
+    }, [imageReady,image,data,dataReady])
 
   return(
     <View style={profileStyles.headerWrapper}>
@@ -40,18 +43,18 @@ const Header = ({}) => {
       </View>
 
       <View style={profileStyles.middleHeader}>
-        <Image source={{uri: image}} style={profileStyles.profilePhoto} />
+        {image !== "" && <Image source={{uri: image}} style={profileStyles.profilePhoto} /> }
         <View style={profileStyles.metadata}>
           <View style={profileStyles.textWrapper}>
-            <Text style={profileStyles.metadataText}>{Math.floor(Math.random() * 100 + 1)}</Text>
+            <Text style={profileStyles.metadataText}>{data.length !== 0 ? data[0] : ""}</Text>
             <Text style={profileStyles.metadataText}>Posts</Text>
           </View>
           <View style={profileStyles.textWrapper}>
-            <Text style={profileStyles.metadataText}>{Math.floor(Math.random() * 100 + 1)}</Text>
+            <Text style={profileStyles.metadataText}>{data.length !== 0 ? data[1] : ""}</Text>
             <Text style={profileStyles.metadataText}>Followers</Text>
           </View>
           <View style={profileStyles.textWrapper}>
-            <Text style={profileStyles.metadataText}>{Math.floor(Math.random() * 100 + 1)}</Text>
+            <Text style={profileStyles.metadataText}>{data.length !== 0 ? data[2] : ""}</Text>
             <Text style={profileStyles.metadataText}>Following</Text>
           </View>
         </View>
