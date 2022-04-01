@@ -30,7 +30,7 @@ const MainStackNavigator = () => {
             >
                 <Stack.Screen name="Welcome" component={WelcomeScreen} />
                 <Stack.Screen name="Registration" component={RegistrationScreen} />
-                <Stack.Screen name="Tab" component={MainTopTabNavigator} />
+                <Stack.Screen name="Tabs" component={MainTopTabNavigator} />
             </Stack.Navigator>
         </NavigationContainer>
     )
@@ -61,12 +61,18 @@ const MainTabNavigator = () => {
     const handleSetImage = (url) => {setImage(url);}
     const toggleImageReady = () => {setImageReady(!imageReady);}
 
+    const changesMade = useSelector(state => state.changesMade);
+
     useEffect(() => {
-    getProfilePhoto(userID, handleSetImage, toggleImageReady);
+        getProfilePhoto(userID, handleSetImage, toggleImageReady);
     }, []);
 
     useEffect(() => {
-    }, [imageReady,image])
+        getProfilePhoto(userID, handleSetImage, toggleImageReady);
+    }, [changesMade]);
+
+    useEffect(() => {
+    }, [imageReady,image, changesMade])
 
 
     return(
@@ -80,7 +86,7 @@ const MainTabNavigator = () => {
                         iconName = focused ? 'home' : 'home-outline';
                       } else if (route.name === 'Explore') {
                         iconName = focused ? 'search' : 'search-outline';
-                      } else if (route.name === 'Profile') {
+                      } else if (route.name === 'Profile' && image.length > 0) {
                         return <Image source={{uri: image}} 
                             style=
                             {{

@@ -76,8 +76,11 @@ const InnerContainer = ({mode, navigation}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const userSignUp = () => {handleUserSignUp(email, fullName, username, password, navigation);} 
-  const userLogIn = () => {handleUserLogIn(username, password, navigation);} 
+  const dispatch = useDispatch();
+  const savePhotoURI = (uri) => {dispatch(saveUserPhoto(uri));}
+
+  const userSignUp = () => {handleUserSignUp(email, fullName, username, password, navigation, savePhotoURI);} 
+  const userLogIn = () => {handleUserLogIn(username, password, navigation, savePhotoURI);} 
 
   return(
     <View style={registrationStyles.innerContainer} > 

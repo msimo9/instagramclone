@@ -4,6 +4,7 @@ import { db } from "./firebase";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, getDoc} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { useDispatch } from "react-redux";
 
 
 //functions
@@ -16,7 +17,7 @@ export const handleUserLogIn = (email, password, navigation) => {
         const user = userCredential.user;
         const userID = user.uid;
         console.log("Log in successful!");
-        navigation.navigate("Tab", {screen: "Tab"});
+        navigation.navigate("Tabs", {screen: "Tab"});
     })
     .catch((error) => {
         const errorCode = error.code;
@@ -38,6 +39,8 @@ export const getProfilePhoto = (userID, handleSetImage, toggleImageReady) => {
     });
 }
 
+
+
 export const readSocialData = async (userID, setData, toggleDataReady) => {
     const docRef = doc(db, "userInfo", userID);
     const docSnap = await getDoc(docRef);
@@ -49,6 +52,18 @@ export const readSocialData = async (userID, setData, toggleDataReady) => {
         tempDataArr.push(docSnap.data().following.length);
         setData(tempDataArr);
         toggleDataReady();
+    } else {
+        console.log("No such document!");
+    }
+}
+
+export const readUserInfo = async (userID, setUserData, toggleUserDataReady) => {
+    const docRef = doc(db, "userInfo", userID);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        setUserData(docSnap.data());
+        toggleUserDataReady();
     } else {
         console.log("No such document!");
     }

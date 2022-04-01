@@ -1,15 +1,15 @@
 //imports
 import { app } from "./firebase";
 import { db } from "./firebase";
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut  } from "firebase/auth";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable} from "firebase/storage";
 import * as ImagePicker from 'expo-image-picker';
-import { useSelector } from "react-redux";
 
 //functions
 
-export const handleUserSignUp = (email, username, fullName, password, navigation) => {
+export const handleUserSignUp = (email, username, fullName, password, navigation, savePhotoURI) => {
+
     const navigateToStart = () => {navigation.navigate("Tab", {screen: "Tab"});}
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
@@ -17,7 +17,7 @@ export const handleUserSignUp = (email, username, fullName, password, navigation
     const user = userCredential.user;
     const userID = user.uid;
     handleSaveAdditionalInfo(email, username, fullName, userID);
-    uploadDefaultProfilePicture(userID, navigateToStart);
+    uploadDefaultProfilePicture(userID, navigateToStart, savePhotoURI);
     console.log("user ", user, " signed up successfully!");
     })
     .catch((error) => {
@@ -44,7 +44,7 @@ export const handleSaveAdditionalInfo = async (email, username, fullName, userID
     );
 }
 
-export const uploadDefaultProfilePicture = async(userID, navigateToStart) => {
+export const uploadDefaultProfilePicture = async(userID, navigateToStart, savePhotoURI) => {
     let file = {
         uri: "https://firebasestorage.googleapis.com/v0/b/instagramclone-a573f.appspot.com/o/defaultProfilePhoto%2Fdefault_avatar.png?alt=media&token=62b298c9-92e7-4cab-9edf-dcbaa9b08f1a",
         cancelled: false,
@@ -90,6 +90,7 @@ export const uploadDefaultProfilePicture = async(userID, navigateToStart) => {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL);
+          savePhotoURI(downloadURL);
           navigateToStart();
         });
       }
@@ -97,7 +98,7 @@ export const uploadDefaultProfilePicture = async(userID, navigateToStart) => {
 
 }
 
-export const uploadCustomProfilePicture = async(userID, file) => {
+export const uploadCustomProfilePicture = async(userID, file, savePhotoURI) => {
 
         //making a blob response out of picked image
         const response = await fetch(file.uri);
@@ -109,13 +110,42 @@ export const uploadCustomProfilePicture = async(userID, file) => {
         const imageFormat = imagePath.substring(imagePath.length-3);
         var storageRef = ref(storage, '/userData/'+userID+'/profilePhoto.'+imageFormat);
 
-        uploadBytes(storageRef, blob2).then((snapshot) => {
+        /*uploadBytes(storageRef, blob2).then((snapshot) => {
             console.log('Profile photo successfuly uploaded :)');
-        });
+        });*/
+
+
+        const uploadTask = uploadBytesResumable(storageRef, blob2);
+        uploadTask.on('state_changed', 
+        (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case 'paused':
+            console.log('Upload is paused');
+            break;
+          case 'running':
+            console.log('Upload is running');
+            break;
+        }
+        }, 
+        (error) => {
+          console.log("Upload was unsuccessful :(");
+          console.log("Error log: ", error);
+        }, 
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log('File available at', downloadURL);
+            savePhotoURI(downloadURL);
+          });
+        }
+    );
 
 }
 
-export const addAdditionalUserInfo = async (userID, name, username, prononouns, website, bio, picture) => {
+export const addAdditionalUserInfo = async (userID, name, username, prononouns, website, bio, picture, savePhotoURI) => {
 
   const updateRef= doc(db, "userInfo", userID);
 
@@ -126,6 +156,14 @@ export const addAdditionalUserInfo = async (userID, name, username, prononouns, 
     website: website,
     bio: bio,
   });
+  uploadCustomProfilePicture(userID, picture, savePhotoURI);
+}
 
-  uploadCustomProfilePicture(userID, picture)
+export const handleUserLogOut = (navigation) => {
+  const auth = getAuth();
+  signOut(auth).then(() => {
+    navigation.navigate("Welcome")
+  }).catch((error) => {
+    // An error happened.
+  });
 }

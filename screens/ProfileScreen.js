@@ -2,33 +2,48 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, Modal} from 'react-nat
 import React, { useState, useEffect } from 'react'
 import profileStyles from './styles/profileStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {getProfilePhoto, readSocialData} from '../firebase/reads';
-import { useSelector } from 'react-redux';
+import {getProfilePhoto, readSocialData, readUserInfo} from '../firebase/reads';
+import { handleUserLogOut } from '../firebase/writes';
+import { useDispatch, useSelector } from 'react-redux';
 import EditProfile from '../components/Profile/EditProfile';
 
 const Header = ({}) => {
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState();
   const [imageReady, setImageReady] = useState(false);
   const handleSetImage = (url) =>  {setImage(url);}
   const toggleImageReady = () => {setImageReady(!imageReady);}
   const userID = useSelector(state => state.userID);
   const [modalVisibility, setModalVisibility] = useState(false);
   const toggleModalVisibility = () => {setModalVisibility(!modalVisibility);}
+
   const [data, setData] = useState([]);
   const [dataReady, setDataReady] = useState(false);
   const toggleDataReady = () => {setDataReady(!dataReady);}
 
+  const [userData, setUserData] = useState();
+  const [userDataReady, setUserDataReady] = useState(false);
+  const toggleUserDataReady = () => {setDataReady(!dataReady);}
+  
+  const profileImage = useSelector(state => state.profilePhotoURL);
+  const changesMade = useSelector(state => state.changesMade);
+
   useEffect(() => {
-    getProfilePhoto(userID, handleSetImage, toggleImageReady);
-    readSocialData(userID, setData, toggleDataReady);
+      getProfilePhoto(userID, handleSetImage, toggleImageReady);
+      readSocialData(userID, setData, toggleDataReady);
+      readUserInfo(userID, setUserData, toggleUserDataReady);
     }, []);
 
     useEffect(() => {
-    }, [imageReady,image,data,dataReady])
+      getProfilePhoto(userID, handleSetImage, toggleImageReady);
+      readSocialData(userID, setData, toggleDataReady);
+    }, [changesMade]);
+
+    useEffect(() => {
+    }, [imageReady,image,data,dataReady, changesMade, userData, userDataReady]);
 
   return(
     <View style={profileStyles.headerWrapper}>
-      {modalVisibility && <EditProfile modalVisibility={modalVisibility} toggleModalVisibility={toggleModalVisibility} profilePhoto={image} />}
+      {modalVisibility && <EditProfile userData={userData} modalVisibility={modalVisibility} toggleModalVisibility={toggleModalVisibility} profilePhoto={image} />}
       <View style={profileStyles.topHeader}>
         <View style={{flexDirection: "row", width: "70%", alignItems: "center"}}>
           <Icon name={"lock-closed-outline"} color={"#ffffff"} size={20} />
@@ -44,6 +59,7 @@ const Header = ({}) => {
 
       <View style={profileStyles.middleHeader}>
         {image !== "" && <Image source={{uri: image}} style={profileStyles.profilePhoto} /> }
+        {image === "" && <View style={profileStyles.profilePhoto}></View> }
         <View style={profileStyles.metadata}>
           <View style={profileStyles.textWrapper}>
             <Text style={profileStyles.metadataText}>{data.length !== 0 ? data[0] : ""}</Text>
@@ -78,10 +94,12 @@ const Header = ({}) => {
   )
 }
 
-const ProfileScreen = () => {
+const ProfileScreen = ({navigation}) => {
+
   return (
     <View style={profileStyles.container}>
       <Header />
+      <TouchableOpacity onPress={() => handleUserLogOut(navigation)}><Text style={{color:"white", size: 16, justifyContent: "center", alignItems: "center", width: "100%"}}>Logout</Text></TouchableOpacity>
     </View>
   )
 }
