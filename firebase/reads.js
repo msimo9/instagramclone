@@ -27,12 +27,13 @@ export const handleUserLogIn = (email, password, navigation) => {
     });
 }
 
-export const getProfilePhoto = (userID, handleSetImage, toggleImageReady) => {
+export const getProfilePhoto = (userID, handleSetImage, toggleImageReady, saveProfilePhotoURI) => {
     const storage = getStorage();
     getDownloadURL(ref(storage, '/userData/'+userID+'/profilePhoto.png'))
     .then((url) => {
         handleSetImage(url);
         toggleImageReady(toggleImageReady);
+        //if(saveProfilePhotoURI){saveProfilePhotoURI(url)}
     })
     .catch((error) => {
         console.log(error);

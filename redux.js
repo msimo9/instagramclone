@@ -33,6 +33,7 @@ export const rootReducer = (state = initialState, action) => {
                 userID: action.payload.uid,
             }
         case SAVE_USER_PHOTO:
+            console.log(action.payload.uri);
             return {
                 ...state,
                 profilePhotoURL: action.payload.uri,

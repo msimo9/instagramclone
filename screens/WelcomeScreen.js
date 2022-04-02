@@ -3,6 +3,9 @@ import React from 'react'
 import welcomeStyles from './styles/welcomeStyle'
 import BlueButton from '../components/BlueButton'
 import InstagramLogoCursive from '../components/InstagramLogoCursive'
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useDispatch, useSelector } from 'react-redux';
+import { saveUserID } from '../redux';
 
 const InnerContainer = ({navigation}) => {
   return(
@@ -24,6 +27,15 @@ const InnerContainer = ({navigation}) => {
 }
 
 const WelcomeScreen = ({navigation}) => {
+  const dispatch = useDispatch();
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+  if (user) {
+      const userID = user.uid;
+      dispatch(saveUserID(userID));
+  } else {
+  }
+  });
   return (
     <View style={welcomeStyles.container}>
       <InnerContainer navigation={navigation}/>

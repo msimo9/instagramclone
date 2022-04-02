@@ -35,13 +35,13 @@ const Footer = ({mode, changeMode}) => {
   )
 }
 
-const LogInForm = ({setUsername, setPassword}) => {
+const LogInForm = ({username, password, setUsername, setPassword}) => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   return(
     <View style={registrationStyles.formContainer}>
-      <TextInput placeholder='Username' style={registrationStyles.input} placeholderTextColor={"#505050"} onChangeText={value => setUsername(value)}/>
+      <TextInput value={username} placeholder='Username' style={registrationStyles.input} placeholderTextColor={"#505050"} onChangeText={value => setUsername(value)}/>
       <View>
-        <TextInput secureTextEntry={secureTextEntry} placeholder='Password' style={registrationStyles.input} placeholderTextColor={"#505050"} onChangeText={value => setPassword(value)}/>
+        <TextInput value={password} secureTextEntry={secureTextEntry} placeholder='Password' style={registrationStyles.input} placeholderTextColor={"#505050"} onChangeText={value => setPassword(value)}/>
         <TouchableOpacity style={registrationStyles.showPassword} onPress={() => setSecureTextEntry(!secureTextEntry)}>
           <Icon name={secureTextEntry ? "eye-outline" : "eye-off-outline"} size={16} color="#458eff" />
         </TouchableOpacity>
@@ -73,8 +73,8 @@ const SignUpForm = ({setEmail, setFullName, setUsername, setPassword}) => {
 const InnerContainer = ({mode, navigation}) => {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("user@user.com");
+  const [password, setPassword] = useState("user1234");
 
   const dispatch = useDispatch();
   const savePhotoURI = (uri) => {dispatch(saveUserPhoto(uri));}
@@ -88,7 +88,7 @@ const InnerContainer = ({mode, navigation}) => {
       {
         mode === "signup"
           ? <SignUpForm setEmail={setEmail} setFullName={setFullName} setUsername={setUsername} setPassword={setPassword}/>
-          : <LogInForm setUsername={setUsername} setPassword={setPassword}/>
+          : <LogInForm username={username} password={password} setUsername={setUsername} setPassword={setPassword}/>
       }
       <BlueButton text={mode === "signup" ? "Sign Up" : "Log In"} action={mode === "signup" ? () => userSignUp() : () => userLogIn()} />
       <View style={{width: "100%", justifyContent: "center", alignItems: "center",}}>
@@ -120,6 +120,9 @@ const RegistrationScreen = ({route, navigation}) => {
     if(formMode === "signup") setFormMode("login");
     else setFormMode("signup");
   }
+
+
+  authObserver();
 
   useEffect(() => {
   }, [formMode])

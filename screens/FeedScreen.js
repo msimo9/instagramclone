@@ -6,14 +6,12 @@ import feedStyles from './styles/feedStyle'
 import FeedHeader from '../components/Feed/FeedHeader'
 import Stories from '../components/Feed/Stories'
 
-const FeedScreen = () => {
-  
-
+const FeedScreen = ({navigation}) => {
   return (
     <View style={feedStyles.container}>
       <FeedHeader />
       <ScrollView style={feedStyles.scollViewContainer}>
-        <Stories />
+        <Stories navigation={navigation} />
       </ScrollView>
     </View>
   )
